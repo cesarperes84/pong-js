@@ -150,12 +150,20 @@ const followBall = () => {
     if( ballX > 160 ) p1Key = 39;
 };
 
-document.addEventListener("keydown",(ev) => {
+document.addEventListener("mousemove", (ev) => {
+    if (p2X > 0 && p2X < w && clickStartGame) {
+        p2X = ev.clientX;
+       //  p2X += Math.ceil(ev.clientX * 0.1);
+        console.log('x', p2X);
+    }
+});
+
+document.addEventListener("keydown", (ev) => {
     if(ev.keyCode == 37 || ev.keyCode ==39)
         p2Key = ev.keyCode
 });
 
-document.addEventListener("click",(ev) => {
+document.addEventListener("click", (ev) => {
     startGame();
 });
 
