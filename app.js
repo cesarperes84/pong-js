@@ -1,4 +1,4 @@
-let ctx, p1Y = 30, p2Y = 410, p1Points, p2Points, p1X = 10, p2X = 220;
+let ctx, p1Y = 30, p2Y = 410, p1Points, p2Points, p1X = 10, p2X = 120;
 let ballY_orientation, ballX_orientation, ballX, ballY;
 let p1Key, p2Key;
 const h=480, w=320, pWidth=100, pHeight=20;
@@ -8,7 +8,6 @@ let speedBallY = 10;
 
 let clickStartGame = false;
 
-const increaseSpeedBall = () => { speedBallY *= 1.05 };
 
 const setup = () => {
     const canvas = document.getElementById("canvas");
@@ -28,11 +27,11 @@ const movmentBars = () => {
     }
 
     if(p2Key == 37 && p2X > 0){ // LEFT
-        p2X -= 5;
+        p2X -= 10;
     } 
     
-    if (p2Key == 39 && p2X <= w + pWidth) { // RIGHT
-        p2X += 5;
+    if (p2Key == 39 && p2X <= w - pWidth) { // RIGHT
+        p2X += 10;
     }
 
 };
@@ -47,25 +46,23 @@ const startGame = () => {
 };
 
 const hitCheck = () => {
-    if (
-        ballX >= p1X && ballX <= p1X 
-        && ballY >= p1Y && ballY <= p1Y + 20
+
+    const extLeftP1 = ballX <= p1X + pWidth;
+    const extRightP1 = ballX >= p1X;
+    if (extLeftP1 && extRightP1 && ballY >= p1Y && ballY <= p1Y + 20
     ) {
         ballY_orientation = 1;
-        ballX_orientation *= -1;
+        ballX_orientation = Math.random() < .5 ? -1 : 1;
     }
-    // p2X = 220
-    // p2Y = 410
 
-    
-    if( ballX >= p2X && ballX <= p2X + pWidth &&  // ERRO 
-        ballY >= p2Y && ballY <= p2Y + 20) {
 
-        console.log('bateu', ballY, ballX) // 418 e 222
+    const extLeftP2 = ballX <= p2X + pWidth;
+    const extRightP2 = ballX >= p2X;
+    if( extLeftP2 && extRightP2 && 
+        ballY >= p2Y && ballY <= p2Y) {
         ballY_orientation = -1;
-        ballX_orientation *= -1;
-        //increaseSpeedBall();
-    }
+        ballX_orientation = Math.random() < .5 ? -1 : 1;
+    } 
 
     // verifica se a bola passou bateu no chão ou no teto
     if(ballX + 10 >= w || ballX <= 0) { 
@@ -80,12 +77,12 @@ const hitCheck = () => {
     
     if (ballY < -20) {
         p2Points++;
+        console.log('ponto');
         initBall();
     }
 };
 
 const movmentBall = () => {
-    //move a bola no eixo X e Y
     ballX += speedBallX * ballX_orientation;
     ballY += speedBallY * ballY_orientation;
 };
@@ -100,8 +97,8 @@ const loop = () => {
 const initBall = () => {
     ballY_orientation = Math.pow(2, Math.floor( Math.random() * 2 )+1) - 3;
     ballX_orientation = Math.pow(2, Math.floor( Math.random() * 2 )+1) - 3; 
-    ballX = w / speedBallX + 80;
-    ballY = h / speedBallY + 80;
+    ballX = 160;
+    ballY = 240;
 };
 
 const draw = () => {
@@ -113,7 +110,7 @@ const draw = () => {
 
     // player 2
     //drawRect(p2X, p2Y, pWidth, pHeight);
-    drawRect(p2X/2, p2Y, pWidth, pHeight);
+    drawRect(p2X, p2Y, pWidth, pHeight);
 
     // barra lateral
     // drawRect(w/2 -5,0,5,h);
@@ -158,13 +155,19 @@ const followBall = () => {
 
 };
 
-/* document.addEventListener("mousemove", (ev) => {
-    if (p2X > 0 && p2X < w && clickStartGame) {
-        p2X = ev.clientX;
-       //  p2X += Math.ceil(ev.clientX * 0.1);
-        console.log('x', p2X);
-    }
-}); */
+const checkWhereTouch = (ev) => {
+    if (clickStartGame) {
+        const clickP2X = ev.clientX;
+        const widthWindow = window.innerWidth;
+         if (clickP2X <= widthWindow/2 && clickP2X) {
+             p2Key = 37;
+         } else {
+             p2Key = 39;
+         }
+     }
+}
+
+document.body.addEventListener('click', (ev) => checkWhereTouch(ev), false);
 
 document.addEventListener("keydown", (ev) => {
     if(ev.keyCode == 37 || ev.keyCode ==39)
